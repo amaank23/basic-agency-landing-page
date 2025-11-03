@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Scto Grotesk A";
+  src: url("/fonts/SctoGroteskA-Regular.1e986128.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Scto Grotesk A";
+  src: url("/fonts/SctoGroteskA-Medium.2ede3563.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Scto Grotesk A";
+  src: url("/fonts/SctoGroteskA-Bold.d6497298.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: "Scto Grotesk A", sans-serif;
+}
+
+:root {
+  --font-sans: "Scto Grotesk A", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sans);
+}
+
+p,
+span,
+a,
+button {
+  font-family: var(--font-sans);
+}
+.nav-link {
+  --underline-transformation: -100%;
+}
+
+.menu li::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background-color: #000;
+  left: 0;
+  bottom: 3px;
+  transform: translateX(var(--underline-transformation, -100%));
+}
