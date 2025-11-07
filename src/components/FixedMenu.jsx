@@ -4,6 +4,7 @@ import { Draggable } from "gsap/Draggable";
 import InertiaPlugin from "gsap/InertiaPlugin";
 import React, { useRef } from "react";
 import { ImCancelCircle } from "react-icons/im";
+import FixedMenuCard from "./FixedMenuCard";
 
 gsap.registerPlugin(Draggable, InertiaPlugin);
 
@@ -11,6 +12,8 @@ const FixedMenu = ({ open, toggle }) => {
   const menuRef = useRef(null);
   const overlay = useRef(null);
   const draggableContainer = useRef(null);
+  const mouseFollowerRef = useRef(null);
+  const isMouseDown = useRef(false);
 
   useGSAP(() => {
     if (open) {
@@ -28,7 +31,7 @@ const FixedMenu = ({ open, toggle }) => {
       });
 
       gsap.set(overlay.current, { x: 0 });
-      gsap.set(draggableContainer.current, { x: 100 });
+      gsap.set(draggableContainer.current, { x: 150 });
       gsap;
       const tl = gsap.timeline();
       tl.to(menuRef.current, {
@@ -51,8 +54,8 @@ const FixedMenu = ({ open, toggle }) => {
           draggableContainer.current,
           {
             x: 0,
-            duration: 0.8,
-            ease: "power4.in",
+            duration: 1.5,
+            ease: "power2.inOut",
             pointerEvents: "auto",
           },
           "<"
@@ -65,6 +68,77 @@ const FixedMenu = ({ open, toggle }) => {
         pointerEvents: "none",
       });
     }
+
+    const handleMouseMove = (e) => {
+      gsap.set(draggableContainer.current, { cursor: "none" });
+      // get bounding box of container for accurate positioning
+      const rect = draggableContainer.current.getBoundingClientRect();
+
+      // calculate relative x/y inside container
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      gsap.to(mouseFollowerRef.current, {
+        x: x - 60, // center follower (100px / 2)
+        y: y - 60,
+        duration: 0.6,
+        ease: "power3.ou",
+      });
+    };
+
+    const handleMouseEnter = () => {
+      gsap.to(mouseFollowerRef.current, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+      });
+    };
+
+    const handleMouseLeave = () => {
+      gsap.set(draggableContainer.current, { cursor: "auto" });
+      gsap.to(mouseFollowerRef.current, {
+        opacity: 0,
+        scale: 0.5,
+        duration: 0.3,
+      });
+    };
+
+    const handleMouseDown = () => {
+      gsap.set(draggableContainer.current, { cursor: "none" });
+
+      // isMouseDown.current = true;
+      gsap.to(mouseFollowerRef.current, {
+        scale: 0.5,
+        duration: 0.3,
+      });
+    };
+
+    const handleMouseUp = () => {
+      gsap.set(draggableContainer.current, { cursor: "none" });
+      console.log("Mouse Up");
+      // isMouseDown.current = false;
+      gsap.to(mouseFollowerRef.current, {
+        scale: 1,
+        duration: 0.3,
+      });
+    };
+
+    // Attach listeners
+    const container = draggableContainer.current;
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseenter", handleMouseEnter);
+    container.addEventListener("mouseleave", handleMouseLeave);
+    container.addEventListener("mousedown", handleMouseDown);
+    container.addEventListener("mouseup", handleMouseUp);
+
+    // Cleanup
+    return () => {
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseenter", handleMouseEnter);
+      container.removeEventListener("mouseleave", handleMouseLeave);
+      container.removeEventListener("mousedown", handleMouseDown);
+      container.removeEventListener("mouseup", handleMouseUp);
+    };
   }, [open]);
 
   return (
@@ -104,24 +178,18 @@ const FixedMenu = ({ open, toggle }) => {
         />
         <div className="overflow-hidden">
           <div
-            className="flex mt-[40px] gap-1 flex-nowrap w-max pl-20"
+            className="flex mt-[40px] gap-1 flex-nowrap w-max pl-20 relative"
             ref={draggableContainer}
           >
-            <div className="w-[440px] px-1 grow-0 shink-0 basis-[440px]">
-              <div className="h-[325px] w-full overflow-hidden">
-                <img
-                  src="/images/fixed-1.webp"
-                  alt=""
-                  className="object-cover w-full h-full scale-[1.1] hover:scale-[1] transition"
-                />
-              </div>
-              <div></div>
-            </div>
-            <div className="w-[440px] h-[400px] bg-amber-300 grow-0 shink-0 basis-[440px]"></div>
-            <div className="w-[440px] h-[400px] bg-amber-300 grow-0 shink-0 basis-[440px]"></div>
-            <div className="w-[440px] h-[400px] bg-amber-300 grow-0 shink-0 basis-[440px]"></div>
-            <div className="w-[440px] h-[400px] bg-amber-300 grow-0 shink-0 basis-[440px]"></div>
-            <div className="w-[440px] h-[400px] bg-amber-300 grow-0 shink-0 basis-[440px]"></div>
+            <div
+              ref={mouseFollowerRef}
+              className="absolute top-0 left-0 w-[120px] h-[120px] bg-[#f9cdcd] rounded-full z-50"
+            ></div>
+            <FixedMenuCard imgUrl={"/images/fixed-1.webp"} />
+            <FixedMenuCard imgUrl={"/images/fixed-2.webp"} />
+            <FixedMenuCard imgUrl={"/images/fixed-3.webp"} />
+            <FixedMenuCard imgUrl={"/images/fixed-4.webp"} />
+            <FixedMenuCard imgUrl={"/images/fixed-5.webp"} />
           </div>
         </div>
       </div>
